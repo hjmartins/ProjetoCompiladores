@@ -1,0 +1,572 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */
+options
+{
+  static = true;
+}
+
+PARSER_BEGIN(MyNewGrammar)
+package testec;
+import java.util.*;
+import java.io.*;
+public class MyNewGrammar
+{
+    public static void main(String args []) throws ParseException, IOException, Exception
+  {
+    MyNewGrammar parser = new MyNewGrammar(new FileInputStream("exe4.txt"));
+    try
+    {
+      MyNewGrammar.start(); 
+    }
+    catch (ParseException e)
+    {
+      System.out.println("Nao foi possivel compilar. " + e);
+    }
+  }
+}
+
+
+PARSER_END(MyNewGrammar)
+
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+| < "//" (~[ "\n", "\r" ])* ( "\n" | "\r" | "\r\n") >
+| < "/*" (~[ "*" ])* "*" ( "*" | ~[ "*", "/" ] (~[ "*" ])* "*" )* "/" >
+}
+
+TOKEN :
+{
+  < INTEGER_LITERAL :
+    < DECIMAL_LITERAL > ([ "l", "L" ])? >
+| < #DECIMAL_LITERAL : [ "0"-"9" ] ([ "0"-"9" ])* > 
+| < FLOAT_LITERAL : 
+    ([ "+", "-" ])? ([ "0"-"9" ])+ "." ([ "0"-"9" ])* > 
+| < CHARACTER_LITERAL : 
+    "\'" ( ~[ "\'", "\\", "\n", "\r" ] |
+     "\\" ([ "n", "t", "b", "r", "f", "\\", "\'", "\"" ]) ) "\'" >
+| < STRING_LITERAL : 
+    "\"" ( ~[ "\"", "\\", "\n", "\r" ]
+    | "\\" ( [ "n", "t", "b", "r", "f", "\\", "\'", "\"" ] | ( [ "\n", "\r" ]
+    | "\r\n" ) ) )* "\"" >
+}
+
+TOKEN :
+
+{
+
+ < VOID : "void" >
+| < CHAR : "char" >
+| < INT : "int" >
+| < LONG : "long" >
+| < FLOAT : "float" >
+| < DOUBLE : "double" >
+| < CASE : "case" >
+| < IF : "if" >
+| < ELSE : "else" >
+| < SWITCH : "switch" >
+| < WHILE : "while" >
+| < FOR : "for" >
+| < DO : "do" >
+| < CONTINUE : "continue" >
+| < BREAK : "break" >
+| < RETURN : "return" >
+| < PRINT : "printf" > 
+| < SCAN : "scanf" >
+}
+
+TOKEN :
+{
+  < IDENTIFICADOR : < LETRA > (< LETRA >| < DIGITO >)* >
+| < #LETRA : [ "A"-"Z", "_", "a"-"z" ] >
+| < #DIGITO : [ "0"-"9" ] >
+
+}
+
+TOKEN :
+{
+  < AC : "{" > 
+| < FC : "}" > 
+| < AP : "(" > 
+| < FP : ")" > 
+| < PV : ";" > 
+| < P : "." > 
+| < ACO : "[" > 
+| < FCO : "]" > 
+| < VIRGULA : "," >
+| < IGUAL : "=" >
+| < INCREMENTO : "++" >
+| < DECREMENTO : "--" >
+| < MAIORIGUAL : ">=" >
+| < MENORIGUAL : "<=" >
+| < MAIOR : ">" >
+| < MENOR : "<" >
+| < IGUALIGUAL : "==" >
+| < DIFERENTE : "!=" >
+| < SOMA : "+" >
+| < SUBTRACAO : "-" >
+| < MULTIPLICACAO : "*" >
+| < DIVISAO : "/" >
+}
+
+int start() throws Exception :
+{}
+{
+  (Programa())+
+  < EOF >
+  {
+    System.out.print("O codigo fornecido em C foi compilado. \n");
+    return 0;
+  }
+}
+
+void Programa() throws Exception :
+{}
+{
+  "#include <stdio.h>"
+  (DefinicaoFuncao())+
+}
+
+
+void DefinicaoFuncao() throws Exception :
+{
+  Token t = null; 
+}
+{
+  (
+    [ LOOKAHEAD(ListaDeclaracao()) ListaDeclaracao() ] [ ListaDeclaracoes()]{}
+    EspecificadoresdeTipo() t = < IDENTIFICADOR > {} < AP > [ ListaTiposParametros() ] < FP > {}
+    CorpoFuncao() 
+  )
+  {
+  }
+}
+
+void ListaTiposParametros() :
+{}
+{
+  ListadeParametros()
+  {
+  }
+}
+
+void ListadeParametros() :
+{}
+{
+  DeclaracaoParametro() 
+  ( LOOKAHEAD(2) "," DeclaracaoParametro() )* 
+  {
+  }
+}
+
+void DeclaracaoParametro() :
+{
+}
+{
+  EspecificadoresdeTipo() VariavelParam() 
+  {										 
+  }
+}
+
+void CorpoFuncao() :
+{}
+{
+  ( "{" [ LOOKAHEAD(ListaDeclaracao()) ListaDeclaracao() ] [ ListaDeclaracoes() ] "}"| ";")
+  {
+  }
+}
+
+
+void ListaDeclaracoes() :
+{}
+{
+  ( DeclaracaoTipo())+
+  {
+  }
+}
+
+void DeclaracaoTipo() :
+{}
+{
+  ( DeclaracaoExpressao() | CorpoFuncao()
+  | DeclaracaoCondicional() | DeclaracaoIteracao() | DeclaracaoDesvio()
+  )
+  {
+  }
+}
+
+void DeclaracaoCondicional() : 
+{
+}
+{
+  (
+    < IF > "(" Expressao() ")"
+    {
+    }
+    DeclaracaoTipo()
+    {
+    }
+    [
+      LOOKAHEAD(2)
+      < ELSE > 
+      DeclaracaoTipo()
+    ]
+    {
+    }
+  )
+  {
+  }
+}
+
+void DeclaracaoIteracao() : 
+{
+}
+{
+  (
+    < WHILE > "(" Expressao() ")" {} DeclaracaoTipo(){ }
+    | < FOR > "(" [ Expressao() ] ";"{} [ Expressao() ] {} ";" {} [ Expressao() ] ")" {} DeclaracaoTipo(){}
+  )
+  {
+  }
+}
+
+void DeclaracaoDesvio() :
+{
+  Token t = null;
+}
+{
+  ( < CONTINUE > ";" {} | < BREAK > ";" {} | < RETURN > [ Expressao() ] ";")
+  {
+  }
+}
+
+void ListaDeclaracao() :
+{}
+{
+  ( LOOKAHEAD(2, EspecificadoresDeclaracao()) EspecificadoresDeclaracao() )+
+}
+void EspecificadoresDeclaracao() :
+{}
+{
+  DeclaracaoEspecificadores() ListaDeclaradoresInicializacao() ";"
+  {
+  }
+}
+
+void DeclaracaoEspecificadores() : 
+{}
+{
+  ( EspecificadoresdeTipo()
+    [LOOKAHEAD(DeclaracaoEspecificadores())DeclaracaoEspecificadores()] )
+  {
+  }
+}
+
+void EspecificadoresdeTipo() : 
+{
+  Token t = null;
+}
+{
+  ( t = < VOID > | t = < CHAR > | t = < INT > | t = < FLOAT > | t = < DOUBLE >)
+  {
+  }
+}
+
+void ListaDeclaradoresInicializacao() :
+{}
+{
+  DeclaradorInit()
+  ( "," DeclaradorInit() {})*
+}
+
+void DeclaradorInit() :
+{
+  Token t = null;
+}
+{
+  VariavelParam()
+  [
+    "=" 
+    Inicializador()
+    {
+    }
+  ]
+  {
+  }
+}
+
+void VariavelParam() :
+{}
+{
+  DeclaracaoDireta()
+  {
+  }
+}
+
+void DeclaracaoDireta() :
+{
+  Token t = null;
+}
+{
+  ( t = < IDENTIFICADOR > | "(" VariavelParam() ")" )
+  {
+  }
+}
+
+void ListaInicializadores() :
+{
+}
+{
+  Inicializador()
+  (
+    LOOKAHEAD(2)
+    "," Inicializador() )*
+  {
+  }
+}
+
+void Inicializador() :
+{}
+{
+  ( ExpressaoAtribuicao())
+  {
+  }
+}
+
+void ExpressaoConstante() :
+{}
+{
+  ExpressaoCondicional()
+  {
+  }
+}
+
+void DeclaracaoExpressao() :
+{
+  Token t = null;
+}
+{
+  (
+    LOOKAHEAD(2) [ Expressao() ] ";" 
+    | 
+    LOOKAHEAD(2) [ < PRINT > ] "(" StringFormatada() ")" ";"
+    |
+    LOOKAHEAD(2) [ < SCAN > ] "(" < STRING_LITERAL > "," "&" < IDENTIFICADOR > ")" ";"
+    |
+    LOOKAHEAD(2) [ ChamadaFuncao() ] ";"
+    | 
+    LOOKAHEAD(2) [ < IDENTIFICADOR > ] "(" [ ListaArgumentos() ] ")" ";"
+    |
+    LOOKAHEAD(2) [ < IDENTIFICADOR > ] "(" [ ListaArgumentos() ] ")"
+    |
+    LOOKAHEAD(2) [ Expressao() "(" [ ListaArgumentos() ] ")" ] ";"
+    {
+    }
+  )
+  {
+  }
+}
+
+void ChamadaFuncao() :
+{
+  Token t;
+}
+{
+  t = < IDENTIFICADOR > "(" [ ListaArgumentos() ] ")"
+  {}
+}
+
+void StringFormatada() :
+{}
+{
+  < STRING_LITERAL > ( "," Expressao() )*
+  {
+  }
+}
+
+void ListaArgumentos() :
+{}
+{
+  Expressao() ( "," Expressao() )*
+  {
+  }
+}
+
+void Expressao() :
+{
+}
+{
+  ExpressaoAtribuicao() ( "," ExpressaoAtribuicao() )*
+  {
+  }
+}
+
+void ExpressaoAtribuicao() :
+{
+}
+{
+  ( LOOKAHEAD(ExpressaoUnaria() OperadorAtribuicao() )
+   ExpressaoUnaria() OperadorAtribuicao() 
+   {}
+   ExpressaoAtribuicao() {}
+   | LOOKAHEAD(1) ExpressaoCondicional() )
+  {
+  }
+}
+
+void OperadorAtribuicao() :
+{
+  Token t = null;
+}
+{
+  ( t = "=" | t = "*=" | t = "/=" | t = "%=" | t = "+="
+  | t = "-=" | t = "<<=" | t = ">>=" | t = "&=" | t = "^=" | t = "|=" )
+  {
+  }
+}
+
+void ExpressaoUnaria() :
+{
+  Token t = null;
+}
+{
+  (
+    LOOKAHEAD(3)
+    ExpressaoIncreDecre()
+  | t = "++" 
+    ExpressaoUnaria()
+  | t = "--" ExpressaoUnaria() | t = "-"  ExpressaoUnaria()
+  | t = "+" ExpressaoUnaria() | t = "/" ExpressaoUnaria()
+  | t = "&" ExpressaoUnaria() | t = "*" ExpressaoUnaria()
+  | t = "~" ExpressaoUnaria() | t = "!" ExpressaoUnaria()
+  )
+  {
+  }
+}
+
+void ExpressaoIncreDecre() :
+{
+  Token t = null;
+}
+{
+  ( ExpressaoPrimaria() ( "[" Expressao() "]" | t = "++" | t = "--")* )
+  {}
+}
+
+void ExpressaoPrimaria() :
+{
+  Token t;
+}
+{
+  ( t =  < IDENTIFICADOR > ("(" Expressao()( "," Expressao() )* ")" )*  | Constant() | "(" Expressao()( "," Expressao() )* ")" )
+  {}
+}
+
+void ExpressaoCondicional() :
+{
+}
+{
+  OULogico(){}
+}
+
+void OULogico() :
+{
+  Token t = null;
+}
+{
+  ELogico()
+  [ t = "||" OULogico() {}]
+}
+
+void ELogico() :
+{
+  Token t = null;
+}
+{
+  ORbits()
+  [ t = "&&" ELogico(){}]
+}
+
+void ORbits() :
+{
+  Token t = null;
+}
+{
+  ORExclusivoBits()
+  [ t = "|"  ORbits(){} ]
+}
+
+void ORExclusivoBits() :
+{
+  Token t = null;
+}
+{
+  AndBits()
+  [ t = "^"  ORExclusivoBits(){} ]
+}
+
+void AndBits() :
+{
+  Token t = null;
+}
+{
+  ExpressaoIgualdade()
+  [ t = "&" AndBits() {} ]
+}
+
+void ExpressaoIgualdade() :
+{
+  Token t = null;
+}
+{
+  ExpressaoRelacional()
+  [ ( t = "==" | t = "!=" ) ExpressaoIgualdade(){} ]
+}
+
+void ExpressaoRelacional() :
+{
+  Token t = null;
+}
+{
+  DeslocamentoBits()
+  [ ( t = "<"| t = ">"| t = "<="| t = ">=") ExpressaoRelacional(){} ]
+}
+
+void DeslocamentoBits() :
+{
+  Token t = null;
+}
+{
+  ExpressaoAditiva()
+  [ ( t = "<<" | t = ">>") DeslocamentoBits() {} ]
+}
+
+void ExpressaoAditiva() :
+{
+  Token t = null;
+}
+{
+  ExpressaoMultiplicativa()
+  [ ( t = "+"| t = "-" ) ExpressaoAditiva(){}]
+}
+
+void ExpressaoMultiplicativa() :
+{
+  Token t = null;
+}
+{
+  ExpressaoUnaria()
+  [ ( t = "*" | t = "/" | t = "%" ) ExpressaoMultiplicativa(){} ]
+}
+
+void Constant() :
+{
+  Token t = null;
+}
+{
+  ( t = < INTEGER_LITERAL > | t = < FLOAT_LITERAL > | t = < CHARACTER_LITERAL > | t = < STRING_LITERAL > )
+}

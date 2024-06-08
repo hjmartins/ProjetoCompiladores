@@ -1,0 +1,46 @@
+#include <stdio.h>
+
+int main() {
+
+    char caractere;
+    int numeroInteiro, contador, resultado,  x = 5, y = 3 ;
+    float numeroReal;
+
+    caractere = 'A';
+    numeroInteiro = 10;
+    numeroReal = 3.14;
+
+    printf("Digite um número inteiro: ");
+    scanf("%d", &numeroInteiro);
+    printf("Você digitou: %d\n", numeroInteiro);
+
+    if (numeroInteiro > 0) {
+        printf("O número é positivo.\n");
+    } else if (numeroInteiro < 0) {
+        printf("O número é negativo.\n");
+    } else {
+        printf("O número é zero.\n");
+    }
+
+    contador = 0;
+    while (contador < 5) {
+        printf("Contador: %d\n", contador);
+        contador++;
+    }
+
+    resultado = soma(numeroInteiro, 5);
+    printf("A soma é: %d\n", resultado);
+
+    if (x > y && numeroInteiro != 0) {
+        printf("Expressão verdadeira.\n");
+    } else {
+        printf("Expressão falsa.\n");
+    }
+
+    return 0;
+}
+
+// Definição da função
+int soma(int a, int b) {
+    return a + b;
+}
